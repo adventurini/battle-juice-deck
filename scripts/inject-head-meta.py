@@ -3,7 +3,7 @@ from pathlib import Path
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
-SITE_BASE = "https://adventurini.github.io/battle-juice-deck"
+SITE_BASE = "https://battle-juice-deck.vercel.app"
 OG_IMAGE = f"{SITE_BASE}/assets/og-image.png"
 DESC = (
     "Confidential investor overview for Battle Juice, Inc. — a cash-funded "

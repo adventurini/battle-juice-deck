@@ -56,7 +56,7 @@ def make_favicon(size: int) -> Image.Image:
 
 def make_og() -> Image.Image:
     logo = Image.open(LOGO).convert("RGBA")
-    img = Image.new("RGB", (OG_W, OG_H), BG)
+    img = Image.new("RGBA", (OG_W, OG_H), BG + (255,))
     draw = ImageDraw.Draw(img)
 
     # subtle gradient bands
@@ -65,9 +65,9 @@ def make_og() -> Image.Image:
         r = int(BG[0] + 18 * (1 - t))
         g = int(BG[1] + 22 * (1 - t))
         b = int(BG[2] + 55 * (1 - t))
-        draw.line([(0, y), (OG_W, y)], fill=(r, g, b))
+        draw.line([(0, y), (OG_W, y)], fill=(r, g, b, 255))
 
-    draw.rectangle([(0, 0), (6, OG_H)], fill=ACCENT)
+    draw.rectangle([(0, 0), (6, OG_H)], fill=ACCENT + (255,))
     fit_logo(img, logo, (80, 70, OG_W - 80, 300))
 
     title_font = load_font(52, bold=True)
@@ -108,7 +108,9 @@ def make_og() -> Image.Image:
         draw.text((80, y), ln, fill=TEXT_DIM, font=body_font)
         y += 34
 
-    return img
+    flat = Image.new("RGB", (OG_W, OG_H), BG)
+    flat.paste(img, mask=img.split()[3])
+    return flat
 
 
 def save_ico(sizes: list[int], path: Path) -> None:
@@ -137,7 +139,14 @@ def write_manifest() -> None:
 
 
 def main() -> None:
+    import subprocess
+    import sys
+
     ASSETS.mkdir(parents=True, exist_ok=True)
+    subprocess.run(
+        [sys.executable, str(ROOT / "scripts" / "make-logo-transparent.py")],
+        check=True,
+    )
     for size, name in [
         (16, "favicon-16.png"),
         (32, "favicon-32.png"),
